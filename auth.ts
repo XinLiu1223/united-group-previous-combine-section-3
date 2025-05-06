@@ -1,10 +1,11 @@
 import NextAuth from "next-auth";
-// import { authConfig } from "./auth.config";
+import { authConfig } from "./auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/db/prisma";
-// import { cookies } from "next/headers";
+import { cookies } from "next/headers";
 import { compare } from "./lib/encrypt";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { NextResponse } from "next/server";
 
 export const config = {
   pages: {
@@ -55,7 +56,7 @@ export const config = {
     }),
   ],
   callbacks: {
-    // ...authConfig.callbacks,
+    ...authConfig.callbacks,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async session({ session, user, trigger, token }: any) {
       // Set the user ID from the token
@@ -72,7 +73,8 @@ export const config = {
 
     // async jwt({ token, user, trigger, session }: any) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async jwt({ token, user }: any) {
+    async jwt({ token, user, trigger }: any) {
+      // async jwt({ token, user }: any) {
       // Assign user fields to token
       if (user) {
         token.id = user.id;
@@ -89,26 +91,28 @@ export const config = {
           });
         }
 
-        //     if (trigger === "signIn" || trigger === "signUp") {
-        //       const cookiesObject = await cookies();
-        //       const sessionCartId = cookiesObject.get("sessionCartId")?.value;
-        //       if (sessionCartId) {
-        //         const sessionCart = await prisma.cart.findFirst({
-        //           where: { sessionCartId },
-        //         });
-        //         if (sessionCart) {
-        //           // Delete current user cart
-        //           await prisma.cart.deleteMany({
-        //             where: { userId: user.id },
-        //           });
-        //           // Assign new cart
-        //           await prisma.cart.update({
-        //             where: { id: sessionCart.id },
-        //             data: { userId: user.id },
-        //           });
-        //         }
-        //       }
-        //     }
+        if (trigger === "signIn" || trigger === "signUp") {
+          const cookiesObject = await cookies();
+          const sessionCartId = cookiesObject.get("sessionCartId")?.value;
+          console.log(sessionCartId);
+
+          //       if (sessionCartId) {
+          //         const sessionCart = await prisma.cart.findFirst({
+          //           where: { sessionCartId },
+          //         });
+          //         if (sessionCart) {
+          //           // Delete current user cart
+          //           await prisma.cart.deleteMany({
+          //             where: { userId: user.id },
+          //           });
+          //           // Assign new cart
+          //           await prisma.cart.update({
+          //             where: { id: sessionCart.id },
+          //             data: { userId: user.id },
+          //           });
+          //         }
+          //       }
+        }
       }
 
       //   // Handle session updates
@@ -117,6 +121,30 @@ export const config = {
       //   }
 
       return token;
+    },
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    authorized({ request, auth }: any) {
+      // authorized({ request, auth }: any) {
+      console.log(auth.user);
+      // Check for session cart cookie
+      if (!request.cookies.get("sessionCartId")) {
+        // Generate new session cart id cookie
+        const sessionCartId = crypto.randomUUID();
+        console.log(sessionCartId);
+
+        const newRequestHeader = new Headers(request.headers);
+
+        const response = NextResponse.next({
+          request: {
+            headers: newRequestHeader,
+          },
+        });
+
+        response.cookies.set("sessionCartId", sessionCartId);
+        // return true;
+        return response;
+      } else return true;
     },
   },
 };
