@@ -6,7 +6,7 @@ import ProductPrice from "@/components/shared/product/product-price";
 // import { Button } from "@/components/ui/button";
 import ProductImages from "@/components/shared/product/product-images";
 import AddToCart from "@/components/shared/product/add-to-cart";
-// import { getMyCart } from '@/lib/actions/cart.actions';
+import { getMyCart } from "@/lib/actions/cart.actions";
 // import ReviewList from './review-list';
 // import { auth } from '@/auth';
 // import Rating from '@/components/shared/product/rating';
@@ -22,7 +22,7 @@ const ProductDetailsPage = async (props: {
   //   const session = await auth();
   //   const userId = session?.user?.id;
 
-  //   const cart = await getMyCart();
+  const cart = await getMyCart();
 
   return (
     <>
@@ -75,7 +75,7 @@ const ProductDetailsPage = async (props: {
                   <div className="flex-center">
                     {/* <Button className="w-full">Add to Cart</Button> */}
                     <AddToCart
-                      // cart={cart}
+                      cart={cart}
                       item={{
                         productId: product.id,
                         name: product.name,

@@ -5,8 +5,7 @@ import { Plus, Minus, Loader } from "lucide-react";
 import { Cart, CartItem } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-// import { addItemToCart, removeItemFromCart } from '@/lib/actions/cart.actions';
-import { addItemToCart } from "@/lib/actions/cart.actions";
+import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart.actions";
 import { useTransition } from "react";
 
 const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem }) => {
@@ -46,13 +45,11 @@ const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem }) => {
   // Handle remove from cart
   const handleRemoveFromCart = async () => {
     startTransition(async () => {
-      //   const res = await removeItemFromCart(item.productId);
+      const res = await removeItemFromCart(item.productId);
 
       toast({
-        // variant: res.success ? 'default' : 'destructive',
-        // description: res.message,
-        variant: "default",
-        description: "res.message",
+        variant: res.success ? "default" : "destructive",
+        description: res.message,
       });
 
       return;
