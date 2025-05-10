@@ -71,9 +71,8 @@ export const config = {
       return session;
     },
 
-    // async jwt({ token, user, trigger, session }: any) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async jwt({ token, user, trigger }: any) {
+    async jwt({ token, user, trigger, session }: any) {
       // async jwt({ token, user }: any) {
       // Assign user fields to token
       if (user) {
@@ -96,29 +95,31 @@ export const config = {
           const sessionCartId = cookiesObject.get("sessionCartId")?.value;
           console.log(sessionCartId);
 
-          //       if (sessionCartId) {
-          //         const sessionCart = await prisma.cart.findFirst({
-          //           where: { sessionCartId },
-          //         });
-          //         if (sessionCart) {
-          //           // Delete current user cart
-          //           await prisma.cart.deleteMany({
-          //             where: { userId: user.id },
-          //           });
-          //           // Assign new cart
-          //           await prisma.cart.update({
-          //             where: { id: sessionCart.id },
-          //             data: { userId: user.id },
-          //           });
-          //         }
-          //       }
+          if (sessionCartId) {
+            const sessionCart = await prisma.cart.findFirst({
+              where: { sessionCartId },
+            });
+
+            if (sessionCart) {
+              // Delete current user cart
+              await prisma.cart.deleteMany({
+                where: { userId: user.id },
+              });
+
+              // Assign new cart
+              await prisma.cart.update({
+                where: { id: sessionCart.id },
+                data: { userId: user.id },
+              });
+            }
+          }
         }
       }
 
-      //   // Handle session updates
-      //   if (session?.user.name && trigger === "update") {
-      //     token.name = session.user.name;
-      //   }
+      // Handle session updates
+      if (session?.user.name && trigger === "update") {
+        token.name = session.user.name;
+      }
 
       return token;
     },
