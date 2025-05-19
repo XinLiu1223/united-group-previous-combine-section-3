@@ -8,8 +8,8 @@ import { getUserById } from "./user.actions";
 import { insertOrderSchema } from "../validators";
 import { prisma } from "@/db/prisma";
 // import { CartItem, PaymentResult, ShippingAddress } from '@/types';
-import { CartItem } from "@/types";
-// import { paypal } from '../paypal';
+import { CartItem, PaymentResult } from "@/types";
+import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@prisma/client";
@@ -131,24 +131,26 @@ export async function createPayPalOrder(orderId: string) {
 
     if (order) {
       // Create paypal order
-      //   const paypalOrder = await paypal.createOrder(Number(order.totalPrice));
+      const paypalOrder = await paypal.createOrder(Number(order.totalPrice));
+
       // Update order with paypal order id
-      //   await prisma.order.update({
-      //     where: { id: orderId },
-      //     data: {
-      //       paymentResult: {
-      //         id: paypalOrder.id,
-      //         email_address: '',
-      //         status: '',
-      //         pricePaid: 0,
-      //       },
-      //     },
-      //   });
-      //   return {
-      //     success: true,
-      //     message: 'Item order created successfully',
-      //     data: paypalOrder.id,
-      //   };
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          paymentResult: {
+            id: paypalOrder.id,
+            email_address: "",
+            status: "",
+            pricePaid: 0,
+          },
+        },
+      });
+
+      return {
+        success: true,
+        message: "Item order created successfully",
+        data: paypalOrder.id,
+      };
     } else {
       throw new Error("Order not found");
     }
@@ -159,8 +161,8 @@ export async function createPayPalOrder(orderId: string) {
 
 // Approve paypal order and update order to paid
 export async function approvePayPalOrder(
-  orderId: string
-  //   data: { orderID: string }
+  orderId: string,
+  data: { orderID: string }
 ) {
   try {
     // Get order from database
@@ -172,27 +174,27 @@ export async function approvePayPalOrder(
 
     if (!order) throw new Error("Order not found");
 
-    // const captureData = await paypal.capturePayment(data.orderID);
+    const captureData = await paypal.capturePayment(data.orderID);
 
-    // if (
-    //   !captureData ||
-    //   captureData.id !== (order.paymentResult as PaymentResult)?.id ||
-    //   captureData.status !== 'COMPLETED'
-    // ) {
-    //   throw new Error('Error in PayPal payment');
-    // }
+    if (
+      !captureData ||
+      captureData.id !== (order.paymentResult as PaymentResult)?.id ||
+      captureData.status !== "COMPLETED"
+    ) {
+      throw new Error("Error in PayPal payment");
+    }
 
     // Update order to paid
-    // await updateOrderToPaid({
-    //   orderId,
-    //   paymentResult: {
-    //     id: captureData.id,
-    //     status: captureData.status,
-    //     email_address: captureData.payer.email_address,
-    //     pricePaid:
-    //       captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
-    //   },
-    // });
+    await updateOrderToPaid({
+      orderId,
+      paymentResult: {
+        id: captureData.id,
+        status: captureData.status,
+        email_address: captureData.payer.email_address,
+        pricePaid:
+          captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
+      },
+    });
 
     revalidatePath(`/order/${orderId}`);
 
@@ -208,10 +210,10 @@ export async function approvePayPalOrder(
 // Update order to paid
 export async function updateOrderToPaid({
   orderId,
-}: //   paymentResult,
-{
+  paymentResult,
+}: {
   orderId: string;
-  //   paymentResult?: PaymentResult;
+  paymentResult?: PaymentResult;
 }) {
   // Get order from database
   const order = await prisma.order.findFirst({
@@ -243,7 +245,7 @@ export async function updateOrderToPaid({
       data: {
         isPaid: true,
         paidAt: new Date(),
-        // paymentResult,
+        paymentResult,
       },
     });
   });
@@ -259,13 +261,13 @@ export async function updateOrderToPaid({
 
   if (!updatedOrder) throw new Error("Order not found");
 
-  //   sendPurchaseReceipt({
-  //     order: {
-  //       ...updatedOrder,
-  //       shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
-  //       paymentResult: updatedOrder.paymentResult as PaymentResult,
-  //     },
-  //   });
+  // sendPurchaseReceipt({
+  //   order: {
+  //     ...updatedOrder,
+  //     shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+  //     paymentResult: updatedOrder.paymentResult as PaymentResult,
+  //   },
+  // });
 }
 
 // Get user's orders
