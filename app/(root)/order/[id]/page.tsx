@@ -20,6 +20,7 @@ const OrderDetailsPage = async (props: {
 
   const order = await getOrderById(id);
   if (!order) notFound();
+  // console.log("order in order-details-table page", order);
 
   //   const session = await auth();
 
@@ -50,7 +51,7 @@ const OrderDetailsPage = async (props: {
         shippingAddress: order.shippingAddress as ShippingAddress,
       }}
       //   stripeClientSecret={client_secret}
-      //   paypalClientId={process.env.PAYPAL_CLIENT_ID || 'sb'}
+      paypalClientId={process.env.PAYPAL_CLIENT_ID || "sb"}
       //   isAdmin={session?.user?.role === 'admin' || false}
     />
   );

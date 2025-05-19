@@ -16,14 +16,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { useTransition } from "react";
-// import {
-//   PayPalButtons,
-//   PayPalScriptProvider,
-//   usePayPalScriptReducer,
-// } from '@paypal/react-paypal-js';
 import {
-  //   createPayPalOrder,
-  //   approvePayPalOrder,
+  PayPalButtons,
+  PayPalScriptProvider,
+  usePayPalScriptReducer,
+} from "@paypal/react-paypal-js";
+import {
+  createPayPalOrder,
+  approvePayPalOrder,
   updateOrderToPaidCOD,
   deliverOrder,
 } from "@/lib/actions/order.actions";
@@ -31,14 +31,14 @@ import {
 
 const OrderDetailsTable = ({
   order,
-}: //   paypalClientId,
-//   isAdmin,
-//   stripeClientSecret,
+  paypalClientId,
+}: // isAdmin,
+// stripeClientSecret,
 {
   order: Omit<Order, "paymentResult">;
-  //   paypalClientId: string;
-  //   isAdmin: boolean;
-  //   stripeClientSecret: string | null;
+  paypalClientId: string;
+  // isAdmin: boolean;
+  // stripeClientSecret: string | null;
 }) => {
   const {
     id,
@@ -54,42 +54,43 @@ const OrderDetailsTable = ({
     paidAt,
     deliveredAt,
   } = order;
+  // console.log("order in order-details-table", order);
 
-  //   const { toast } = useToast();
+  const { toast } = useToast();
 
-  //   const PrintLoadingState = () => {
-  // const [{ isPending, isRejected }] = usePayPalScriptReducer();
-  // let status = '';
+  const PrintLoadingState = () => {
+    const [{ isPending, isRejected }] = usePayPalScriptReducer();
+    let status = "";
 
-  // if (isPending) {
-  //   status = 'Loading PayPal...';
-  // } else if (isRejected) {
-  //   status = 'Error Loading PayPal';
-  // }
-  // return status;
-  //   };
+    if (isPending) {
+      status = "Loading PayPal...";
+    } else if (isRejected) {
+      status = "Error Loading PayPal";
+    }
+    return status;
+  };
 
-  //   const handleCreatePayPalOrder = async () => {
-  // const res = await createPayPalOrder(order.id);
+  const handleCreatePayPalOrder = async () => {
+    const res = await createPayPalOrder(order.id);
 
-  // if (!res.success) {
-  //   toast({
-  //     variant: 'destructive',
-  //     description: res.message,
-  //   });
-  // }
+    if (!res.success) {
+      toast({
+        variant: "destructive",
+        description: res.message,
+      });
+    }
 
-  // return res.data;
-  //   };
+    return res.data;
+  };
 
-  //   const handleApprovePayPalOrder = async (data: { orderID: string }) => {
-  // const res = await approvePayPalOrder(order.id, data);
+  const handleApprovePayPalOrder = async (data: { orderID: string }) => {
+    const res = await approvePayPalOrder(order.id, data);
 
-  // toast({
-  //   variant: res.success ? 'default' : 'destructive',
-  //   description: res.message,
-  // });
-  //   };
+    toast({
+      variant: res.success ? "default" : "destructive",
+      description: res.message,
+    });
+  };
 
   // Button to mark order as paid
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -238,15 +239,17 @@ const OrderDetailsTable = ({
               </div>
 
               {/* PayPal Payment */}
+              {/* my payment method in DB is paymentMethod: 'CashOnDelivery' for now so disbale */}
+              {/* {!isPaid && ( */}
               {!isPaid && paymentMethod === "PayPal" && (
                 <div>
-                  {/* <PayPalScriptProvider options={{ clientId: paypalClientId }}>
+                  <PayPalScriptProvider options={{ clientId: paypalClientId }}>
                     <PrintLoadingState />
                     <PayPalButtons
                       createOrder={handleCreatePayPalOrder}
                       onApprove={handleApprovePayPalOrder}
                     />
-                  </PayPalScriptProvider> */}
+                  </PayPalScriptProvider>
                 </div>
               )}
 
