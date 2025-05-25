@@ -32,12 +32,12 @@ import {
 const OrderDetailsTable = ({
   order,
   paypalClientId,
-}: // isAdmin,
-// stripeClientSecret,
+  isAdmin,
+}: // stripeClientSecret,
 {
   order: Omit<Order, "paymentResult">;
   paypalClientId: string;
-  // isAdmin: boolean;
+  isAdmin: boolean;
   // stripeClientSecret: string | null;
 }) => {
   const {
@@ -93,7 +93,6 @@ const OrderDetailsTable = ({
   };
 
   // Button to mark order as paid
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const MarkAsPaidButton = () => {
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
@@ -118,7 +117,6 @@ const OrderDetailsTable = ({
   };
 
   // Button to mark order as delivered
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const MarkAsDeliveredButton = () => {
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
@@ -263,10 +261,10 @@ const OrderDetailsTable = ({
               )} */}
 
               {/* Cash On Delivery */}
-              {/* {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
+              {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
                 <MarkAsPaidButton />
-              )} */}
-              {/* {isAdmin && isPaid && !isDelivered && <MarkAsDeliveredButton />} */}
+              )}
+              {isAdmin && isPaid && !isDelivered && <MarkAsDeliveredButton />}
             </CardContent>
           </Card>
         </div>

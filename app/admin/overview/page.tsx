@@ -83,7 +83,7 @@ const AdminOverviewPage = async () => {
           <CardContent>
             <Charts
               data={{
-                salesData: summary.salesData,
+                salesData: summary?.salesData,
               }}
             />
           </CardContent>
