@@ -13,6 +13,7 @@ const currency = z
 
 // Schema for Product Insert
 export const insertProductSchema = z.object({
+  // id: z.string().min(1, "Id is required"),
   name: z.string().min(3, "Name musr at least 3 characters"),
   slug: z.string().min(3, "Slug musr at least 3 characters"),
   category: z.string().min(3, "Category musr at least 3 characters"),
@@ -24,6 +25,28 @@ export const insertProductSchema = z.object({
   banner: z.string().nullable(),
   price: currency,
   //   rating: currency,
+});
+
+// const updateProductOnlyIdObj = {
+//   id: z.string().min(1, "Id is required"),
+// };
+
+// Schema for updating products
+// export const updateProductSchema = insertProductSchema.extend(
+//   updateProductOnlyIdObj
+// );
+export const updateProductSchema = z.object({
+  id: z.string().min(1, "Id is required"),
+  name: z.string().min(3, "Name musr at least 3 characters"),
+  slug: z.string().min(3, "Slug musr at least 3 characters"),
+  category: z.string().min(3, "Category musr at least 3 characters"),
+  brand: z.string().min(3, "Brand musr at least 3 characters"),
+  description: z.string().min(3, "Description musr at least 3 characters"),
+  stock: z.coerce.number(),
+  images: z.array(z.string()).min(1, "Product must have at least 1 img"),
+  isFeatured: z.boolean(),
+  banner: z.string().nullable(),
+  price: currency,
 });
 
 // Schema for signing users in
