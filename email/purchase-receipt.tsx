@@ -15,9 +15,8 @@ import {
 import { Order } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import sampleData from "@/db/sample-data";
-
-import * as lib1 from "dotenv";
-lib1.config();
+import dotenv from "dotenv";
+dotenv.config();
 
 PurchaseReceiptEmail.PreviewProps = {
   order: {
