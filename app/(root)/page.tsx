@@ -4,9 +4,9 @@ import {
   getFeaturedProducts,
 } from "@/lib/actions/product.actions";
 import ProductCarousel from "@/components/shared/product/product-carousel";
-// import ViewAllProductsButton from '@/components/view-all-products-button';
-// import IconBoxes from '@/components/icon-boxes';
-// import DealCountdown from '@/components/deal-countdown';
+import ViewAllProductsButton from "@/components/view-all-products-button";
+import IconBoxes from "@/components/icon-boxes";
+import DealCountdown from "@/components/deal-countdown";
 // import sampleData from "@/db/sample-data";
 
 // import { Button } from "@/components/ui/button";
@@ -36,9 +36,9 @@ const Homepage = async () => {
         title="Newest Arrivals"
         limit={4}
       />
-      {/* <ViewAllProductsButton /> */}
-      {/* <DealCountdown /> */}
-      {/* <IconBoxes /> */}
+      <ViewAllProductsButton />
+      <DealCountdown />
+      <IconBoxes />
       {/* </Button> */}
     </>
   );
